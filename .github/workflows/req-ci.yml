@@ -1,0 +1,28 @@
+name: Requirements & Traceability CI
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+jobs:
+  req-trace:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run checks and generate traceability
+        run: |
+          python scripts/reqtrace.py --roots .kiro spec docs --outdir ci_out
+
+      - name: Upload traceability artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: traceability-report
+          path: ci_out/
